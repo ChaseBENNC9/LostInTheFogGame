@@ -50,6 +50,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player")
 
 	class USceneComponent* playerModel;
+private:
+	class APlayerController* pc;
 
 private:
 	virtual void OnMove(const FInputActionValue& Value);

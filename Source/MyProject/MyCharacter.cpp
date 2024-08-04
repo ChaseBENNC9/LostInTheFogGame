@@ -22,15 +22,15 @@ AMyCharacter::AMyCharacter()
 	visualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
 		visualMesh->SetupAttachment(playerModel);
 
-	 //springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	 //springArm->SetupAttachment(RootComponent);
-	 //springArm->TargetArmLength = 300.f;
-	 //springArm->bUsePawnControlRotation = true;
+	 springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	 springArm->SetupAttachment(RootComponent);
+	 springArm->TargetArmLength = 300.f;
+	 springArm->bUsePawnControlRotation = true;
 
 	 //Attach the camera to the root component
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-		//Camera->SetupAttachment(springArm,USpringArmComponent::SocketName);
-	Camera->SetupAttachment(RootComponent);
+		Camera->SetupAttachment(springArm,USpringArmComponent::SocketName);
+	//Camera->SetupAttachment(RootComponent);
 		Camera->bUsePawnControlRotation = false;
 
 
@@ -72,9 +72,9 @@ void AMyCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	FVector MouseLocation, MouseDirection;
 
-	APlayerController* PController = GetWorld()->GetFirstPlayerController();
+	APlayerController* PController = Cast<APlayerController>(Controller);
 
-	PController->bShowMouseCursor = true;
+	PController->bShowMouseCursor = false;
 
 	float xMouse, yMouse;
 
@@ -97,7 +97,7 @@ void AMyCharacter::Tick(float DeltaTime)
 
 	FRotator rot(0, angle, 0);
 
-	playerModel->SetRelativeRotation(rot);
+	SetActorRotation(rot);
 
 
 
@@ -133,18 +133,8 @@ void AMyCharacter::OnMove(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y * movementSpeed);
 		AddMovementInput(GetActorRightVector(), MovementVector.X * movementSpeed);
-		//// Update rotation to face movement direction
-		//if (!MovementDirection.IsZero())
-		//{
-			FRotator NewRotation = MovementDirection.Rotation();
-			NewRotation.Pitch = 0; // Keep the character level, ignoring pitch
-			NewRotation.Roll = 0;  // Keep the character level, ignoring roll
-			//playerModel->SetRelativeRotation(NewRotation,true);
-		//	SetActorRotation(NewRotation);
-		//}
 
 
-		
 	}
 	
 }
