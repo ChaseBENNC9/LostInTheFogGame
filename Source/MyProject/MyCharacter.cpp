@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFrameWork/SpringArmComponent.h"
 
 
 // Sets default values
@@ -12,14 +13,25 @@ AMyCharacter::AMyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	//Attach PlayerModel to the Root
+	playerModel = CreateDefaultSubobject<USceneComponent>(TEXT("PlayerParent"));
+		playerModel->SetupAttachment(RootComponent);
 
-	visualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	 
-	visualMesh->SetupAttachment(RootComponent);
+	//Attach the VisualMesh to the PlayerModel 
+	visualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
+		visualMesh->SetupAttachment(playerModel);
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	// Attach the camera to the root component
+	 //springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	 //springArm->SetupAttachment(RootComponent);
+	 //springArm->TargetArmLength = 300.f;
+	 //springArm->bUsePawnControlRotation = true;
+
+	 //Attach the camera to the root component
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+		//Camera->SetupAttachment(springArm,USpringArmComponent::SocketName);
 	Camera->SetupAttachment(RootComponent);
+		Camera->bUsePawnControlRotation = false;
 
 
 
@@ -58,6 +70,36 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	FVector MouseLocation, MouseDirection;
+
+	APlayerController* PController = GetWorld()->GetFirstPlayerController();
+
+	PController->bShowMouseCursor = true;
+
+	float xMouse, yMouse;
+
+	PController->GetMousePosition(xMouse, yMouse);
+
+	FVector CharLoc = GetActorLocation();
+
+	FVector2D CharInScreen;
+	PController->ProjectWorldLocationToScreen(CharLoc, CharInScreen);
+
+	FVector2D Result;
+	Result.X = -(yMouse - CharInScreen.Y);
+	Result.Y = xMouse - CharInScreen.X;
+
+	// Get angle rotation and rotation Character
+	float angle = FMath::RadiansToDegrees(FMath::Acos(Result.X / Result.Size()));
+
+	if (Result.Y < 0)
+		angle = 360 - angle;
+
+	FRotator rot(0, angle, 0);
+
+	playerModel->SetRelativeRotation(rot);
+
+
 
 }
 
@@ -82,10 +124,32 @@ void AMyCharacter::OnMove(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
+		// Add movement
+		FVector ForwardDirection = GetActorForwardVector();
+		FVector RightDirection = GetActorRightVector();
+
+		// Calculate the movement direction based on input
+		FVector MovementDirection = (ForwardDirection * MovementVector.Y) + (RightDirection * MovementVector.X);
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y * movementSpeed);
 		AddMovementInput(GetActorRightVector(), MovementVector.X * movementSpeed);
+		//// Update rotation to face movement direction
+		//if (!MovementDirection.IsZero())
+		//{
+			FRotator NewRotation = MovementDirection.Rotation();
+			NewRotation.Pitch = 0; // Keep the character level, ignoring pitch
+			NewRotation.Roll = 0;  // Keep the character level, ignoring roll
+			//playerModel->SetRelativeRotation(NewRotation,true);
+		//	SetActorRotation(NewRotation);
+		//}
+
+
 		
 	}
+	
 }
+	void AMyCharacter::OnLook(const FInputActionValue & Value)
+	{
+
+	}
 

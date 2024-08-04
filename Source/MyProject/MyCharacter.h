@@ -35,15 +35,24 @@ public:
 	class UInputMappingContext* DefaultMappingContext;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	class UInputAction* MoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	class UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visuals")
 	 UStaticMeshComponent* visualMesh;
 
 	 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	 float movementSpeed = 15.0f;
-	 UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "Player")
+	 UPROPERTY(EditAnywhere, BluePrintReadOnly,Category = "Camera")
 	 class UCameraComponent* Camera;
+	 UPROPERTY(EditAnywhere, BluePrintReadOnly, Category = "Camera")
+	 class USpringArmComponent* springArm;
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Player")
+
+	class USceneComponent* playerModel;
 
 private:
 	virtual void OnMove(const FInputActionValue& Value);
+	virtual void OnLook(const FInputActionValue& value);
 
 };
