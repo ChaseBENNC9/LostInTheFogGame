@@ -11,6 +11,15 @@
 // Sets default values
 AMyCharacter::AMyCharacter()
 {
+	DefaultMappingContext = nullptr;
+	InteractAction = nullptr;
+	MoveAction = nullptr;
+	JumpAction = nullptr;
+	SpecialAction = nullptr;
+	focusedBrazier = nullptr;
+	lastActivatedBrazier = nullptr;
+	fuel = 100.00f;
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -70,11 +79,13 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	fuel -= (DeltaTime * 0.5);
 	FVector MouseLocation, MouseDirection;
 
 	APlayerController* PController = Cast<APlayerController>(Controller);
 
-	PController->bShowMouseCursor = false;
+	PController->bShowMouseCursor = true;
 
 	float xMouse, yMouse;
 
@@ -97,9 +108,7 @@ void AMyCharacter::Tick(float DeltaTime)
 
 	FRotator rot(0, angle, 0);
 
-	SetActorRotation(rot);
-
-
+	playerModel->SetRelativeRotation(rot);
 
 }
 
@@ -110,11 +119,18 @@ void AMyCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	{
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMyCharacter::OnMove);
+		//Jump
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AMyCharacter::BeginJump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMyCharacter::EndJump);
 
-		//Looking
+
+		//Attack
+
+		//Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMyCharacter::OnInteract);
+
 	}
 	
-
 }
 
 void AMyCharacter::OnMove(const FInputActionValue& Value)
@@ -138,8 +154,26 @@ void AMyCharacter::OnMove(const FInputActionValue& Value)
 	}
 	
 }
-	void AMyCharacter::OnLook(const FInputActionValue & Value)
-	{
 
+	void AMyCharacter::OnInteract(const FInputActionValue& value)
+	{
+		//Light the Brazier and set the static instance / uses some fuel from the lantern. This brazier can be used to set the lantern back to 100%. braziers have infinite fuel
+		UE_LOG(LogTemp, Warning, TEXT("Interact Key Held"));
+
+
+	}
+
+	void AMyCharacter::BeginJump(const FInputActionValue& value)
+	{
+		Jump();
+	}
+
+	void AMyCharacter::EndJump(const FInputActionValue& value)
+	{
+		StopJumping();
+	}
+
+	void AMyCharacter::OnSpecial(const FInputActionValue& value)
+	{
 	}
 
