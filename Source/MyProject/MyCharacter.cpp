@@ -159,6 +159,10 @@ void AMyCharacter::OnMove(const FInputActionValue& Value)
 	{
 		//Light the Brazier and set the static instance / uses some fuel from the lantern. This brazier can be used to set the lantern back to 100%. braziers have infinite fuel
 		UE_LOG(LogTemp, Warning, TEXT("Interact Key Held"));
+		if (focusedBrazier)
+		{
+			focusedBrazier->Activate();
+		}
 
 
 	}

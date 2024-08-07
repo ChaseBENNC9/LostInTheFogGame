@@ -29,7 +29,7 @@ ABrazier::ABrazier()
 void ABrazier::BeginPlay()
 {
 	Super::BeginPlay();
-	light->SetActive(false);
+	light->SetIntensity(0);
 }
 
 // Called every frame
@@ -40,7 +40,7 @@ void ABrazier::Tick(float DeltaTime)
 
 void ABrazier::Activate()
 {
-	light->SetActive(true);
+	light->SetIntensity(50000);
 
 }
 
