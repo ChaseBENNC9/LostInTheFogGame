@@ -1,10 +1,3 @@
-# Lost in the Fog
-**Engine:** Unreal Engine   
-**Language(s):** C++, Unreal Blueprints
-## Game Description
+https://dev.azure.com/chasebennetthill/Lost-In-The-Fog
 
-
-## Controls 
-
-
-## Installation
+This repo is only used for the releases 
